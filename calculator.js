@@ -17,6 +17,7 @@ function calculateCeilingValue() {
     const average = parseFloat(document.getElementById('pc-average').value);
     const totalPackages = parseInt(document.getElementById('total-packages').value);
     const ceilingCount = parseInt(document.getElementById('ceiling-package-count').value);
+    const providedCeiling = parseFloat(document.getElementById('pc-ceiling').value);
 
     if (isNaN(floor) || isNaN(average) || isNaN(totalPackages) || isNaN(ceilingCount)) {
         alert('Please enter all required values');
@@ -30,6 +31,18 @@ function calculateCeilingValue() {
 
     if (ceilingCount >= totalPackages) {
         alert('Number of ceiling packages must be less than total packages');
+        return;
+    }
+
+    if (!isNaN(providedCeiling)) {
+        if (providedCeiling <= average) {
+            alert('Ceiling value must be greater than average value');
+            return;
+        }
+        // Use the provided ceiling value
+        document.querySelectorAll('.ceiling-value').forEach(input => {
+            input.value = providedCeiling.toFixed(2);
+        });
         return;
     }
 
@@ -109,15 +122,38 @@ function calculatePackageCountProbability() {
     const totalPackages = totalCeilingCount + floorCount;
     const calculatedAverage = (floor * floorCount + totalCeilingValue) / totalPackages;
 
+    // Combine packages with same value
+    const combinedPackages = {};
+    ceilingPackages.forEach(pkg => {
+        const key = pkg.value.toFixed(2);
+        if (!combinedPackages[key]) {
+            combinedPackages[key] = { value: pkg.value, count: 0 };
+        }
+        combinedPackages[key].count += pkg.count;
+    });
+
     // Calculate probabilities
-    const probabilities = ceilingPackages.map(pkg => ({
+    const probabilities = Object.values(combinedPackages).map(pkg => ({
         value: pkg.value,
+        count: pkg.count,
         probability: pkg.count / totalPackages * 100
     }));
 
     const floorProbability = floorCount / totalPackages * 100;
     const probAboveAverage = probabilities.reduce((sum, pkg) => 
         pkg.value > average ? sum + pkg.probability : sum, 0);
+
+    // Calculate attempts needed for different success rates
+    const attemptsFor50 = Math.ceil(Math.log(0.5) / Math.log(1 - (probAboveAverage/100)));
+    const attemptsFor75 = Math.ceil(Math.log(0.25) / Math.log(1 - (probAboveAverage/100)));
+    const attemptsFor90 = Math.ceil(Math.log(0.1) / Math.log(1 - (probAboveAverage/100)));
+    const attemptsFor99 = Math.ceil(Math.log(0.01) / Math.log(1 - (probAboveAverage/100)));
+    
+    // Calculate total cost assuming each package costs the average value
+    const costFor50 = attemptsFor50 * average;
+    const costFor75 = attemptsFor75 * average;
+    const costFor90 = attemptsFor90 * average;
+    const costFor99 = attemptsFor99 * average;
 
     // Display result
     const resultDiv = document.getElementById('pc-result');
@@ -132,10 +168,25 @@ function calculatePackageCountProbability() {
         <ul>
             <li>Packages worth $${floor.toFixed(2)} (${floorCount} packages): ${floorProbability.toFixed(2)}%</li>
             ${probabilities.map(pkg => 
-                `<li>Packages worth $${pkg.value.toFixed(2)}: ${pkg.probability.toFixed(2)}%</li>`
+                `<li>Packages worth $${pkg.value.toFixed(2)} (${pkg.count} packages): ${pkg.probability.toFixed(2)}%</li>`
             ).join('')}
         </ul>
+        <h3>Investment Required for Different Success Rates:</h3>
+        <div class="probability-results">
+            <p><span class="chance">50% chance</span> requires <strong>${attemptsFor50} packages</strong> at $${average.toFixed(2)} each<br>
+            Total investment: <span class="cost">$${costFor50.toFixed(2)}</span></p>
+            
+            <p><span class="chance">75% chance</span> requires <strong>${attemptsFor75} packages</strong> at $${average.toFixed(2)} each<br>
+            Total investment: <span class="cost">$${costFor75.toFixed(2)}</span></p>
+            
+            <p><span class="chance">90% chance</span> requires <strong>${attemptsFor90} packages</strong> at $${average.toFixed(2)} each<br>
+            Total investment: <span class="cost">$${costFor90.toFixed(2)}</span></p>
+            
+            <p><span class="chance">99% chance</span> requires <strong>${attemptsFor99} packages</strong> at $${average.toFixed(2)} each<br>
+            Total investment: <span class="cost">$${costFor99.toFixed(2)}</span></p>
+        </div>
     `;
+    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function calculateSuccessAttempts() {
@@ -151,6 +202,8 @@ function calculateSuccessAttempts() {
     // Calculate attempts needed for 90% and 99% overall success chance
     // Using formula: 1 - (1-p)^n >= target
     // Solving for n: n >= log(1-target)/log(1-p)
+    const attemptsFor50 = Math.ceil(Math.log(0.5) / Math.log(1 - probability));
+    const attemptsFor75 = Math.ceil(Math.log(0.25) / Math.log(1 - probability));
     const attemptsFor90 = Math.ceil(Math.log(0.1) / Math.log(1 - probability));
     const attemptsFor99 = Math.ceil(Math.log(0.01) / Math.log(1 - probability));
 
@@ -159,11 +212,18 @@ function calculateSuccessAttempts() {
     resultDiv.innerHTML = `
         <h2>Results:</h2>
         <p>With a ${successChance}% chance of success per attempt:</p>
-        <ul>
-            <li>You need <strong>${attemptsFor90}</strong> attempts for a 90% overall chance of success</li>
-            <li>You need <strong>${attemptsFor99}</strong> attempts for a 99% overall chance of success</li>
-        </ul>
+        <h3>Investment Required for Different Success Rates:</h3>
+        <div class="probability-results">
+            <p><span class="chance">50% chance</span> requires <strong>${attemptsFor50}</strong> attempts</p>
+            
+            <p><span class="chance">75% chance</span> requires <strong>${attemptsFor75}</strong> attempts</p>
+            
+            <p><span class="chance">90% chance</span> requires <strong>${attemptsFor90}</strong> attempts</p>
+            
+            <p><span class="chance">99% chance</span> requires <strong>${attemptsFor99}</strong> attempts</p>
+        </div>
     `;
+    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function calculateProbability() {
@@ -214,6 +274,18 @@ function calculateProbability() {
     const percentage = (probAboveAverage * 100).toFixed(2);
 
     // Display result
+    // Calculate attempts needed for different success rates
+    const attemptsFor50 = Math.ceil(Math.log(0.5) / Math.log(1 - probAboveAverage));
+    const attemptsFor75 = Math.ceil(Math.log(0.25) / Math.log(1 - probAboveAverage));
+    const attemptsFor90 = Math.ceil(Math.log(0.1) / Math.log(1 - probAboveAverage));
+    const attemptsFor99 = Math.ceil(Math.log(0.01) / Math.log(1 - probAboveAverage));
+    
+    // Calculate total cost assuming each package costs the average value
+    const costFor50 = attemptsFor50 * average;
+    const costFor75 = attemptsFor75 * average;
+    const costFor90 = attemptsFor90 * average;
+    const costFor99 = attemptsFor99 * average;
+
     const resultDiv = document.getElementById('result');
     resultDiv.style.display = 'block';
     resultDiv.innerHTML = `
@@ -225,5 +297,20 @@ function calculateProbability() {
             <li>Packages worth $${average.toFixed(2)}: ${(averageProb * 100).toFixed(2)}%</li>
             <li>Packages worth $${ceiling.toFixed(2)}: ${(ceilingProb * 100).toFixed(2)}%</li>
         </ul>
+        <h3>Investment Required for Different Success Rates:</h3>
+        <div class="probability-results">
+            <p><span class="chance">50% chance</span> requires <strong>${attemptsFor50} packages</strong> at $${average.toFixed(2)} each<br>
+            Total investment: <span class="cost">$${costFor50.toFixed(2)}</span></p>
+            
+            <p><span class="chance">75% chance</span> requires <strong>${attemptsFor75} packages</strong> at $${average.toFixed(2)} each<br>
+            Total investment: <span class="cost">$${costFor75.toFixed(2)}</span></p>
+            
+            <p><span class="chance">90% chance</span> requires <strong>${attemptsFor90} packages</strong> at $${average.toFixed(2)} each<br>
+            Total investment: <span class="cost">$${costFor90.toFixed(2)}</span></p>
+            
+            <p><span class="chance">99% chance</span> requires <strong>${attemptsFor99} packages</strong> at $${average.toFixed(2)} each<br>
+            Total investment: <span class="cost">$${costFor99.toFixed(2)}</span></p>
+        </div>
     `;
+    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }

@@ -39,3 +39,12 @@ Built using:
 - CSS3
 - Vanilla JavaScript
 - Mobile-responsive design
+
+## Important Notes
+
+This calculator makes several simplifying assumptions to provide estimates:
+- It assumes a discrete distribution of package values
+- It assumes packages can only contain certain specific values
+- It uses mathematical models that may not perfectly match real-world scenarios
+
+Different games may have varying rules, conditions, or distributions that could affect actual probabilities. This tool is for educational and informational purposes only and should not be used as the sole basis for gambling decisions.

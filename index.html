@@ -115,6 +115,39 @@
             border-bottom: none;
         }
 
+        .probability-results {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+        }
+
+        .probability-results p {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .probability-results p:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .chance {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cost {
+            color: var(--primary-color);
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
         .tabs {
             display: flex;
             gap: 1rem;
@@ -165,6 +198,16 @@
             background-color: #ccc;
         }
 
+        .disclaimer {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: var(--border-radius);
+            padding: 0.8em;
+            margin-bottom: var(--spacing);
+            font-size: 0.9em;
+            color: #856404;
+        }
+
         @media (max-width: 480px) {
             :root {
                 --spacing: 0.8rem;
@@ -197,22 +240,27 @@
         
         <div id="simple-tab" class="tab-content active">
             <div class="card">
-            <div class="form-group">
-        <label for="floor">Floor Value ($):</label>
-        <input type="number" id="floor" required min="0" step="0.01">
-            </div>
+                <div class="disclaimer">
+                    <p><em>Note: This calculator makes simplifying assumptions and is for informational purposes only. Actual games may have different rules or conditions that affect probabilities.</em></p>
+                </div>
+            <form id="simple-form" onsubmit="event.preventDefault(); calculateProbability();">
+                <div class="form-group">
+                    <label for="floor">Floor Value ($):</label>
+                    <input type="number" id="floor" required min="0" step="0.01">
+                </div>
 
-            <div class="form-group">
-        <label for="ceiling">Ceiling Value ($):</label>
-        <input type="number" id="ceiling" required min="0" step="0.01">
-            </div>
+                <div class="form-group">
+                    <label for="ceiling">Ceiling Value ($):</label>
+                    <input type="number" id="ceiling" required min="0" step="0.01">
+                </div>
 
-            <div class="form-group">
-        <label for="average">Average Value ($):</label>
-        <input type="number" id="average" required min="0" step="0.01">
-            </div>
+                <div class="form-group">
+                    <label for="average">Average Value ($):</label>
+                    <input type="number" id="average" required min="0" step="0.01">
+                </div>
 
-            <button onclick="calculateProbability()">Calculate Probability</button>
+                <button type="submit">Calculate Probability</button>
+            </form>
         </div>
 
         <div id="result" class="card"></div>
@@ -220,41 +268,56 @@
 
         <div id="package-count-tab" class="tab-content">
             <div class="card">
-                <div class="form-group">
-                    <label for="pc-floor">Floor Value ($):</label>
-                    <input type="number" id="pc-floor" required min="0" step="0.01">
+                <div class="disclaimer">
+                    <p><em>Note: This advanced calculator assumes specific package distributions. Actual games may have different rules or conditions that affect probabilities.</em></p>
                 </div>
+                <form id="package-count-form" onsubmit="event.preventDefault(); calculatePackageCountProbability();">
+                    <div class="form-group">
+                        <label for="pc-floor">Floor Value ($):</label>
+                        <input type="number" id="pc-floor" required min="0" step="0.01">
+                    </div>
 
-                <div class="form-group">
-                    <label for="pc-average">Average Value ($):</label>
-                    <input type="number" id="pc-average" required min="0" step="0.01">
-                </div>
+                    <div class="form-group">
+                        <label for="pc-ceiling">Ceiling Value ($) (Optional):</label>
+                        <input type="number" id="pc-ceiling" min="0" step="0.01">
+                    </div>
 
-                <div class="form-group">
-                    <label for="total-packages">Approximate Total Packages:</label>
-                    <input type="number" id="total-packages" required min="1" step="1">
-                </div>
-                <div class="form-group">
-                    <label for="ceiling-package-count">Number of Ceiling Packages:</label>
-                    <input type="number" id="ceiling-package-count" required min="1" step="1" value="1">
-                    <button onclick="generateCeilingPackages()" class="secondary-btn">Generate Package Inputs</button>
-                    <button onclick="calculateCeilingValue()" class="secondary-btn">Calculate Ceiling Value</button>
-                </div>
+                    <div class="form-group">
+                        <label for="pc-average">Average Value ($):</label>
+                        <input type="number" id="pc-average" required min="0" step="0.01">
+                    </div>
 
-                <div id="ceiling-packages">
-                </div>
-                <button onclick="calculatePackageCountProbability()">Calculate Probability</button>
+                    <div class="form-group">
+                        <label for="total-packages">Approximate Total Packages:</label>
+                        <input type="number" id="total-packages" required min="1" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="ceiling-package-count">Number of Ceiling Packages:</label>
+                        <input type="number" id="ceiling-package-count" required min="1" step="1" value="1">
+                        <button type="button" onclick="generateCeilingPackages()" class="secondary-btn">Generate Package Inputs</button>
+                        <button type="button" onclick="calculateCeilingValue()" class="secondary-btn">Calculate Ceiling Value</button>
+                    </div>
+
+                    <div id="ceiling-packages">
+                    </div>
+                    <button type="submit">Calculate Probability</button>
+                </form>
             </div>
             <div id="pc-result" class="card"></div>
         </div>
 
         <div id="succeed-tab" class="tab-content">
             <div class="card">
-                <div class="form-group">
-                    <label for="success-chance">Success Chance (%):</label>
-                    <input type="number" id="success-chance" required min="0" max="100" step="0.01">
+                <div class="disclaimer">
+                    <p><em>Note: This calculator assumes independent events with consistent probabilities. Actual success rates may vary based on specific game conditions.</em></p>
                 </div>
-                <button onclick="calculateSuccessAttempts()">Calculate Required Attempts</button>
+                <form id="success-form" onsubmit="event.preventDefault(); calculateSuccessAttempts();">
+                    <div class="form-group">
+                        <label for="success-chance">Success Chance (%):</label>
+                        <input type="number" id="success-chance" required min="0" max="100" step="0.01">
+                    </div>
+                    <button type="submit">Calculate Required Attempts</button>
+                </form>
             </div>
             <div id="succeed-result" class="card"></div>
         </div>
