@@ -138,6 +138,34 @@ function calculatePackageCountProbability() {
     `;
 }
 
+function calculateSuccessAttempts() {
+    const successChance = parseFloat(document.getElementById('success-chance').value);
+    
+    if (isNaN(successChance) || successChance <= 0 || successChance > 100) {
+        alert('Please enter a valid success chance between 0 and 100');
+        return;
+    }
+
+    const probability = successChance / 100;
+    
+    // Calculate attempts needed for 90% and 99% overall success chance
+    // Using formula: 1 - (1-p)^n >= target
+    // Solving for n: n >= log(1-target)/log(1-p)
+    const attemptsFor90 = Math.ceil(Math.log(0.1) / Math.log(1 - probability));
+    const attemptsFor99 = Math.ceil(Math.log(0.01) / Math.log(1 - probability));
+
+    const resultDiv = document.getElementById('succeed-result');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+        <h2>Results:</h2>
+        <p>With a ${successChance}% chance of success per attempt:</p>
+        <ul>
+            <li>You need <strong>${attemptsFor90}</strong> attempts for a 90% overall chance of success</li>
+            <li>You need <strong>${attemptsFor99}</strong> attempts for a 99% overall chance of success</li>
+        </ul>
+    `;
+}
+
 function calculateProbability() {
     // Get input values
     const floor = parseFloat(document.getElementById('floor').value);
