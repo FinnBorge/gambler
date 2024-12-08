@@ -115,6 +115,56 @@
             border-bottom: none;
         }
 
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: var(--spacing);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.8em;
+            background-color: #ddd;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .ceiling-package {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .ceiling-value, .ceiling-count {
+            flex: 1;
+        }
+
+        .secondary-btn {
+            background-color: #ddd;
+            color: var(--text-color);
+            margin-bottom: var(--spacing);
+        }
+
+        .secondary-btn:hover {
+            background-color: #ccc;
+        }
+
         @media (max-width: 480px) {
             :root {
                 --spacing: 0.8rem;
@@ -127,6 +177,11 @@
             .container {
                 width: 100%;
             }
+
+            .ceiling-package {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
         }
     </style>
 </head>
@@ -134,7 +189,13 @@
     <div class="container">
         <h1>Package Value Probability Calculator</h1>
         
-        <div class="card">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('simple')">Simple Calculator</button>
+            <button class="tab-btn" onclick="showTab('package-count')">Package Count Calculator</button>
+        </div>
+        
+        <div id="simple-tab" class="tab-content active">
+            <div class="card">
             <div class="form-group">
         <label for="floor">Floor Value ($):</label>
         <input type="number" id="floor" required min="0" step="0.01">
@@ -154,6 +215,32 @@
         </div>
 
         <div id="result" class="card"></div>
+        </div>
+
+        <div id="package-count-tab" class="tab-content">
+            <div class="card">
+                <div class="form-group">
+                    <label for="pc-floor">Floor Value ($):</label>
+                    <input type="number" id="pc-floor" required min="0" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="pc-average">Average Value ($):</label>
+                    <input type="number" id="pc-average" required min="0" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="ceiling-package-count">Number of Ceiling Packages:</label>
+                    <input type="number" id="ceiling-package-count" required min="1" step="1" value="1">
+                    <button onclick="generateCeilingPackages()" class="secondary-btn">Generate Package Inputs</button>
+                </div>
+
+                <div id="ceiling-packages">
+                </div>
+                <button onclick="calculatePackageCountProbability()">Calculate Probability</button>
+            </div>
+            <div id="pc-result" class="card"></div>
+        </div>
     </div>
 
     <script src="calculator.js"></script>
