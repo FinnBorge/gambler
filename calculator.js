@@ -12,6 +12,44 @@ function showTab(tabName) {
     document.querySelector(`.tab-btn[onclick="showTab('${tabName}')"]`).classList.add('active');
 }
 
+function calculateCeilingValue() {
+    const floor = parseFloat(document.getElementById('pc-floor').value);
+    const average = parseFloat(document.getElementById('pc-average').value);
+    const totalPackages = parseInt(document.getElementById('total-packages').value);
+    const ceilingCount = parseInt(document.getElementById('ceiling-package-count').value);
+
+    if (isNaN(floor) || isNaN(average) || isNaN(totalPackages) || isNaN(ceilingCount)) {
+        alert('Please enter all required values');
+        return;
+    }
+
+    if (floor >= average) {
+        alert('Floor value must be less than average value');
+        return;
+    }
+
+    if (ceilingCount >= totalPackages) {
+        alert('Number of ceiling packages must be less than total packages');
+        return;
+    }
+
+    // Let x be the number of floor packages (totalPackages - ceilingCount)
+    // Let c be the ceiling value we're solving for
+    // Then: (floor * x + c * ceilingCount) / totalPackages = average
+    // Solving for c:
+    // floor * x + c * ceilingCount = average * totalPackages
+    // c * ceilingCount = average * totalPackages - floor * x
+    // c = (average * totalPackages - floor * (totalPackages - ceilingCount)) / ceilingCount
+
+    const floorCount = totalPackages - ceilingCount;
+    const ceilingValue = (average * totalPackages - floor * floorCount) / ceilingCount;
+
+    // Update all ceiling value inputs
+    document.querySelectorAll('.ceiling-value').forEach(input => {
+        input.value = ceilingValue.toFixed(2);
+    });
+}
+
 function generateCeilingPackages() {
     const container = document.getElementById('ceiling-packages');
     const count = parseInt(document.getElementById('ceiling-package-count').value);

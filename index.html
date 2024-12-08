@@ -230,9 +230,14 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="total-packages">Approximate Total Packages:</label>
+                    <input type="number" id="total-packages" required min="1" step="1">
+                </div>
+                <div class="form-group">
                     <label for="ceiling-package-count">Number of Ceiling Packages:</label>
                     <input type="number" id="ceiling-package-count" required min="1" step="1" value="1">
                     <button onclick="generateCeilingPackages()" class="secondary-btn">Generate Package Inputs</button>
+                    <button onclick="calculateCeilingValue()" class="secondary-btn">Calculate Ceiling Value</button>
                 </div>
 
                 <div id="ceiling-packages">
