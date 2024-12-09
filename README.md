@@ -1,6 +1,6 @@
 # Package Value Probability Calculator
 
-This web-based calculator helps users understand the probability distribution of mystery package gambling games. In these games, players can purchase packages containing unknown amounts of money, where the operator discloses three key values:
+This web-based calculator was built in an afternoon in response to my observation of a few "loot-box" style streams.  I developed the sense that viewers did not fully understand the "Effective Value" of their wagers and I felt uncomfortable with how certain stream operators were presenting the odds of winning, so I created this small web-application to assist the intuition of "buyers" when determining how best to spend their money.  Specifically, it helps users understand the probability distribution of mystery package gambling games. In these games, players can purchase packages containing unknown amounts of money, where the operator discloses three key values:
 
 - Floor Value: The minimum amount a package can contain
 - Ceiling Value: The maximum amount a package can contain
